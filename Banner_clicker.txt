@@ -1,12 +1,25 @@
 CREATE VIEW CustDecPurch AS
-SELECT Clickers.UserID, 
+SELECT Clicks.UserID, 
    SUM((QuotedPrice)*(QuantityClicked)) AS Purchase 
- FROM Clickers INNER JOIN Click_Details
-   ON Clickers.ClickNumber = Click_Details.ClickNumber 
- WHERE Clickers.ClickDate Between '2019-01-01'
+ FROM Clicks INNER JOIN Click_Details
+   ON Clicks.ClickNumber = Click_Details.ClickNumber 
+ WHERE Clicks.ClickDate Between '2019-01-01'
      AND '2019-12-31' 
- GROUP BY Clickers.UserID;
+ GROUP BY Clicks.UserID;
+ 
+CREATE VIEW Re_s AS
+SELECT CustDecPurch.UserID, ztblPurchaseRe_s.NumRe_s
+ FROM CustDecPurch CROSS JOIN ztblPurchaseRe_s
+ WHERE CustDecPurch.Purchase BETWEEN 
+   ztblPurchaseRe_s.LowSpend AND 
+   ztblPurchaseRe_s.HighSpend;
 
-SELECT * FROM CustDecPurch;
+SELECT C.CustFirstName, C.CustLastName, C.CustStreetAddress, 
+     C.CustCity, C.CustState, C.CustZipCode, CP.NumRe_s
+FROM Re_s AS CP INNER JOIN Users AS C
+  ON CP.UserID = C.UserID
+CROSS JOIN ztblSeqNumbers AS z
+WHERE z.Sequence <= CP.NumRe_s;
 
+DROP VIEW Re_s;
 DROP VIEW CustDecPurch;
