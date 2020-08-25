@@ -1,0 +1,12 @@
+CREATE VIEW CustDecPurch AS
+SELECT Clickers.UserID, 
+   SUM((QuotedPrice)*(QuantityClicked)) AS Purchase 
+ FROM Clickers INNER JOIN Click_Details
+   ON Clickers.ClickNumber = Click_Details.ClickNumber 
+ WHERE Clickers.ClickDate Between '2019-01-01'
+     AND '2019-12-31' 
+ GROUP BY Clickers.UserID;
+
+SELECT * FROM CustDecPurch;
+
+DROP VIEW CustDecPurch;
