@@ -1,0 +1,19 @@
+SELECT std_name
+      ,COUNT(*)
+  FROM ( SELECT b.std_name
+               ,a.days
+               ,a.pm10_avg
+               ,b.pm10_start
+               ,b.pm10_end
+         FROM fine_dust_standard b
+             ,( SELECT TO_CHAR(a.mea_date, 'YYYY-MM-DD') days
+                      ,ROUND(AVG(a.pm10),0) pm10_avg
+                 FROM fine_dust a
+                WHERE a.mea_date < TO_DATE('2019-01-01', 'YYYY-MM-DD')
+                GROUP BY  TO_CHAR(mea_date, 'YYYY-MM-DD')
+               ) a
+         WHERE b.org_name = 'WHO'
+           AND a.pm10_avg BETWEEN b.pm10_start 
+                              AND b.pm10_end
+         )
+   GROUP BY std_name;
